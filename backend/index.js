@@ -5,7 +5,7 @@ const { default: mongoose } = require("mongoose");
 require('dotenv').config({path:"./.env"});
 
 
-console.log(process.env.MONGO_LINK);
+console.log("Starting the server...");
 const app = express();
 app.use(cors())
 app.use(express.json())
