@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
         required: true,
         minLength: 6
     },
-    firsName: {
+    firstName: {
         type: String,
         required: true,
         maxLength: 50,
@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
 
 const accountSchema = new mongoose.Schema({
     userId: {
-        type: mongoose.Schema.Types.Objectid,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true
     },

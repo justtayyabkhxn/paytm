@@ -1,14 +1,17 @@
 const { JWT_SECRET } = require("./config");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
-const authMiddleware = (res, req, next) => {
-    const authHeader = req.header.authorization;
+const authMiddleware = (req, res, next) => {
+    const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith('Bearer')) {
-        return res.status(403).json({})
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(403).json({
+            message:"Not valid Token"
+        });
     }
 
-    const token = authHeader.split('')[1];
+    const token = authHeader.split(' ')[1];
+    console.log("token is "+token);
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
@@ -17,7 +20,9 @@ const authMiddleware = (res, req, next) => {
 
         next();
     } catch (err) {
-        return res.status(403).json({})
+        return res.status(403).json({
+            message:err
+        });
     }
 };
 

@@ -1,13 +1,14 @@
 const express = require('express');
+const jwt=require("jsonwebtoken")
 
-const authMiddleware = require("../middleware");
+const {authMiddleware} = require("../middleware");
 const router = express.Router();
 const zod = require("zod");
 const { User, Account } = require("../db");
 const { JWT_SECRET } = require("../config");
 
 const signupBody = zod.object({
-    username: zod.string().email,
+    username: zod.string().email(),
     firstName: zod.string(),
     lastName: zod.string(),
     password: zod.string()
@@ -90,19 +91,30 @@ const updateBody = zod.object({
     lastName: zod.string().optional(),
 })
 
-router.put("/", authMiddleware, async (req, res) => {
-    const success = updateBody.safeParse(req, body);
-    if (!success) {
-        res.status(411).json({
-            message: "Error while updating info"
-        })
+router.post("/", authMiddleware, async (req, res) => {
+    // Validate the request body
+    const result = updateBody.safeParse(req.body);
+    if (!result.success) {
+        return res.status(400).json({
+            message: "Validation error",
+            errors: result.error.errors, // Include validation errors
+        });
     }
-    await User.updateOne({ _id: req.userId }, req.body)
 
-    res.json({
-        message: "Updated Succesfully"
-    })
-})
+    try {
+        // Update user information
+        await User.updateOne({ _id: req.userId }, result.data);
+
+        res.json({
+            message: "Updated Successfully",
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Internal server error",
+            error: error.message,
+        });
+    }
+});
 
 
 router.get("/bulk", async (req, res) => {
