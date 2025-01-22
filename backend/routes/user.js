@@ -1,7 +1,7 @@
 const express = require('express');
-const jwt=require("jsonwebtoken")
+const jwt = require("jsonwebtoken")
 
-const {authMiddleware} = require("../middleware");
+const { authMiddleware } = require("../middleware");
 const router = express.Router();
 const zod = require("zod");
 const { User, Account } = require("../db");
@@ -42,6 +42,7 @@ router.post("/signup", async (req, res) => {
         userId,
         balance: 1 + Math.random() * 1000
     })
+    console.log("New User " + user)
 
     const token = jwt.sign({
         userId
@@ -74,6 +75,7 @@ router.post("/signin", async (req, res) => {
         const token = jwt.sign({
             userId: user._id
         }, JWT_SECRET);
+        console.log("New Login: " + user);
 
         res.json({
             token: token
@@ -140,5 +142,43 @@ router.get("/bulk", async (req, res) => {
         }))
     })
 })
+
+router.post("/getUser", async (req, res) => {
+    try {
+        const {userId} = req.body; 
+        // console.log("User Id Recieved: "+userId)// Assumes req.userId is set, e.g., via middleware
+        const user = await User.findOne({ _id: userId });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // console.log(user);
+        res.json({
+            user: user,
+        });
+    } catch (error) {
+        console.error("Error fetching user:", error.message);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+router.post("/getallUsers", async (req, res) => {
+    try {
+        const users = await User.find({ });
+
+        if (!users) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // console.log(users);
+        res.json({
+            users: users,
+        });
+    } catch (error) {
+        console.error("Error fetching user:", error.message);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
 
 module.exports = router;

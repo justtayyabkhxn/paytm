@@ -7,7 +7,7 @@ const router = express.Router();
 
 // GET /balance
 router.get("/balance",authMiddleware, async (req, res) => {
-    console.log("Inside Middleware");
+    // console.log("Inside Middleware");
     try {
         const account = await Account.findOne({ userId: req.userId });
 
@@ -15,10 +15,13 @@ router.get("/balance",authMiddleware, async (req, res) => {
             return res.status(404).json({ message: "Account not found" });
         }
 
-        console.log("User ID:", req.userId);
-        console.log("Account Balance:", account.balance);
+        // console.log("User ID:", req.userId);
+        // console.log("Account Balance:", account.balance);
 
-        res.json({ balance: account.balance });
+        res.json({ 
+            balance: account.balance,
+            userId: req.userId
+         });
     } catch (error) {
         console.error("Error fetching balance:", error);
         res.status(500).json({ message: "Internal server error", error: error.message });
